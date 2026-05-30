@@ -1,0 +1,114 @@
+.calendar {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.header-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title-text {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.today-hint {
+  font-size: 22rpx;
+  color: #4A90D9;
+  margin-top: 4rpx;
+}
+
+.calendar-weekdays {
+  display: flex;
+  padding: 20rpx 0 10rpx;
+}
+
+.weekday {
+  flex: 1;
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.weekend {
+  color: #E74C3C;
+}
+
+.calendar-days {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.day-cell {
+  width: calc(100% / 7);
+  height: 80rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.day-cell.empty {
+  pointer-events: none;
+}
+
+.day-text {
+  font-size: 28rpx;
+  color: #333;
+  width: 56rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 50%;
+}
+
+.day-cell.today .day-text {
+  color: #4A90D9;
+  font-weight: 600;
+}
+
+.day-cell.selected .day-text {
+  background-color: #4A90D9;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.event-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background-color: #4A90D9;
+  position: absolute;
+  bottom: 4rpx;
+}
+
+.day-cell.selected .event-dot {
+  background-color: #ffffff;
+}

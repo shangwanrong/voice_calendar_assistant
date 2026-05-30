@@ -1,0 +1,7 @@
+{
+  "name": "voice-calendar",
+  "version": "1.0.0",
+  "description": "语音日历微信小程序",
+  "main": "app.js",
+  "dependencies": {}
+}

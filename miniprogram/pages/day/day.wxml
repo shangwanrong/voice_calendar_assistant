@@ -1,0 +1,31 @@
+<view class="container">
+  <view class="day-header">
+    <view class="nav-btn" bindtap="onPrevDay">
+      <text class="nav-arrow">◀</text>
+    </view>
+    <view class="day-info">
+      <text class="day-title">{{friendlyDate}}</text>
+      <text class="day-week">{{weekDay}}</text>
+    </view>
+    <view class="nav-btn" bindtap="onNextDay">
+      <text class="nav-arrow">▶</text>
+    </view>
+  </view>
+
+  <view class="time-timeline">
+    <view class="events-list" wx:if="{{events.length > 0}}">
+      <event-card wx:for="{{events}}" wx:key="_id"
+                  event="{{item}}" showDelete="{{true}}"
+                  bind:tap="onEventTap" bind:delete="onEventDelete" />
+    </view>
+
+    <view class="empty-state" wx:if="{{events.length === 0}}">
+      <text class="empty-icon">☀️</text>
+      <text class="empty-text">这一天没有安排</text>
+    </view>
+  </view>
+
+  <view class="fab-add" bindtap="onAddTap">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

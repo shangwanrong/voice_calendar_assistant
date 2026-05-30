@@ -1,0 +1,16 @@
+<view class="event-card" bindtap="onTap">
+  <view class="card-left">
+    <view class="category-bar" style="background-color: {{categoryColor}}"></view>
+  </view>
+  <view class="card-content">
+    <view class="card-title">{{event.title}}</view>
+    <view class="card-info">
+      <text class="card-time" wx:if="{{friendlyTime}}">🕐 {{friendlyTime}}</text>
+      <text class="card-reminder" wx:if="{{event.reminder}}">🔔 提前{{event.reminder}}分钟</text>
+    </view>
+    <view class="card-note" wx:if="{{event.note}}">{{event.note}}</view>
+  </view>
+  <view class="card-actions" wx:if="{{showDelete}}" catchtap="onDelete">
+    <text class="delete-btn">🗑️</text>
+  </view>
+</view>

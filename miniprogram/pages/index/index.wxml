@@ -1,0 +1,29 @@
+<view class="container">
+  <calendar currentDate="{{currentDate}}" eventDates="{{eventDates}}" bind:dateselect="onDateSelect" bind:monthchange="onMonthChange" />
+
+  <view class="section-header">
+    <text class="section-title">{{currentDate === today ? '今日安排' : currentDate + ' 安排'}}</text>
+    <view class="section-actions">
+      <text class="action-link" bindtap="onDayViewTap">日视图</text>
+      <text class="action-link add-link" bindtap="onAddTap">+ 添加</text>
+    </view>
+  </view>
+
+  <view class="events-list" wx:if="{{todayEvents.length > 0}}">
+    <event-card wx:for="{{todayEvents}}" wx:key="_id"
+                event="{{item}}" showDelete="{{true}}"
+                bind:tap="onEventTap" bind:delete="onEventDelete" />
+  </view>
+
+  <view class="empty-state" wx:if="{{todayEvents.length === 0}}">
+    <text class="empty-icon">📅</text>
+    <text class="empty-text">暂无安排，点击语音按钮添加</text>
+  </view>
+
+  <view class="feedback-bar {{showFeedback ? 'show' : ''}} {{feedbackType}}" wx:if="{{showFeedback}}">
+    <text class="feedback-icon">{{feedbackType === 'success' ? '✅' : feedbackType === 'error' ? '❌' : 'ℹ️'}}</text>
+    <text class="feedback-text">{{feedbackText}}</text>
+  </view>
+
+  <voice-btn isListening="{{isListening}}" recognizingText="{{recognizingText}}" bind:tap="onVoiceTap" />
+</view>

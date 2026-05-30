@@ -1,0 +1,36 @@
+<view class="container">
+  <view class="stats-card">
+    <view class="stat-item">
+      <text class="stat-number">{{totalEvents}}</text>
+      <text class="stat-label">总事件</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-number">{{todayEvents}}</text>
+      <text class="stat-label">今日安排</text>
+    </view>
+  </view>
+
+  <view class="settings-card">
+    <view class="settings-title">语音设置</view>
+    <view class="settings-item">
+      <text class="settings-label">语音反馈</text>
+      <switch checked="{{voiceFeedback}}" bindchange="onVoiceFeedbackChange" color="#4A90D9" />
+    </view>
+  </view>
+
+  <view class="settings-card">
+    <view class="settings-title">数据管理</view>
+    <view class="settings-item danger" bindtap="onClearData">
+      <text class="settings-label">清空所有数据</text>
+      <text class="settings-arrow">▶</text>
+    </view>
+  </view>
+
+  <view class="settings-card">
+    <view class="settings-item" bindtap="onAbout">
+      <text class="settings-label">关于语音日历</text>
+      <text class="settings-arrow">▶</text>
+    </view>
+  </view>
+</view>

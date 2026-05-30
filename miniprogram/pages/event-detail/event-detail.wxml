@@ -1,0 +1,94 @@
+<view class="container">
+  <block wx:if="{{!isEditing}}">
+    <view class="detail-card">
+      <view class="detail-header">
+        <view class="detail-category" style="background-color: {{categoryList[categoryIndex] ? categoryList[categoryIndex].color : '#95A5A6'}}">
+          <text class="category-text">{{categoryList[categoryIndex] ? categoryList[categoryIndex].label : '其他'}}</text>
+        </view>
+        <text class="detail-title">{{event.title}}</text>
+      </view>
+
+      <view class="detail-row">
+        <text class="detail-label">📅 日期</text>
+        <text class="detail-value">{{event.date}}</text>
+      </view>
+
+      <view class="detail-row" wx:if="{{!event.isAllDay && event.startTime}}">
+        <text class="detail-label">🕐 时间</text>
+        <text class="detail-value">{{event.startTime}}{{event.endTime ? ' - ' + event.endTime : ''}}</text>
+      </view>
+
+      <view class="detail-row" wx:if="{{event.isAllDay}}">
+        <text class="detail-label">🕐 时间</text>
+        <text class="detail-value">全天</text>
+      </view>
+
+      <view class="detail-row" wx:if="{{event.reminder}}">
+        <text class="detail-label">🔔 提醒</text>
+        <text class="detail-value">提前{{event.reminder}}分钟</text>
+      </view>
+
+      <view class="detail-row" wx:if="{{event.note}}">
+        <text class="detail-label">📝 备注</text>
+        <text class="detail-value">{{event.note}}</text>
+      </view>
+    </view>
+
+    <view class="action-buttons">
+      <button class="btn-primary" bindtap="onEditTap">编辑</button>
+      <button class="btn-danger" bindtap="onDelete">删除</button>
+    </view>
+  </block>
+
+  <block wx:if="{{isEditing}}">
+    <view class="form-card">
+      <view class="form-item">
+        <text class="form-label">事件名称</text>
+        <input class="form-input" value="{{title}}" bindinput="onTitleInput" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">日期</text>
+        <picker mode="date" value="{{date}}" bindchange="onDateChange">
+          <view class="form-picker">{{date}}</view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <text class="form-label">全天</text>
+        <switch checked="{{isAllDay}}" bindchange="onAllDayChange" color="#4A90D9" />
+      </view>
+      <view class="form-item" wx:if="{{!isAllDay}}">
+        <text class="form-label">开始时间</text>
+        <picker mode="time" value="{{startTime}}" bindchange="onStartTimeChange">
+          <view class="form-picker">{{startTime || '选择时间'}}</view>
+        </picker>
+      </view>
+      <view class="form-item" wx:if="{{!isAllDay}}">
+        <text class="form-label">结束时间</text>
+        <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
+          <view class="form-picker">{{endTime || '选择时间'}}</view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <text class="form-label">分类</text>
+        <picker range="{{categoryList}}" range-key="label" value="{{categoryIndex}}" bindchange="onCategoryChange">
+          <view class="form-picker">{{categoryList[categoryIndex].label}}</view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <text class="form-label">提醒</text>
+        <picker range="{{reminderOptions}}" value="{{reminderIndex}}" bindchange="onReminderChange">
+          <view class="form-picker">{{reminderOptions[reminderIndex]}}</view>
+        </picker>
+      </view>
+      <view class="form-item full">
+        <text class="form-label">备注</text>
+        <textarea class="form-textarea" value="{{note}}" bindinput="onNoteInput" maxlength="200" />
+      </view>
+    </view>
+
+    <view class="action-buttons">
+      <button class="btn-primary" bindtap="onSave">保存</button>
+      <button class="btn-cancel" bindtap="onCancelEdit">取消</button>
+    </view>
+  </block>
+</view>

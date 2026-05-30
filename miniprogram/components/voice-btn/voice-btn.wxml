@@ -1,0 +1,21 @@
+<view class="voice-btn-container">
+  <view class="voice-overlay" wx:if="{{isListening}}" catchtap="onTap">
+    <view class="voice-modal">
+      <view class="pulse-ring {{pulseAnimation ? 'animate' : ''}}">
+        <view class="pulse-ring-inner {{pulseAnimation ? 'animate' : ''}}"></view>
+      </view>
+      <view class="mic-icon {{isListening ? 'active' : ''}}">
+        <text class="mic-emoji">🎤</text>
+      </view>
+      <text class="voice-hint">{{isListening ? '正在聆听...' : '点击说话'}}</text>
+      <text class="recognizing-text" wx:if="{{recognizingText}}">{{recognizingText}}</text>
+      <view class="voice-cancel" catchtap="onTap">
+        <text class="cancel-text">点击停止</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="voice-fab {{isListening ? 'listening' : ''}}" bindtap="onTap" wx:if="{{!isListening}}">
+    <text class="fab-icon">🎤</text>
+  </view>
+</view>

@@ -1,0 +1,133 @@
+.voice-btn-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.voice-fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 120rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4A90D9, #357ABD);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(74, 144, 217, 0.4);
+  z-index: 100;
+}
+
+.voice-fab.listening {
+  background: linear-gradient(135deg, #E74C3C, #C0392B);
+  box-shadow: 0 8rpx 24rpx rgba(231, 76, 60, 0.4);
+}
+
+.fab-icon {
+  font-size: 48rpx;
+}
+
+.voice-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.voice-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-ring {
+  position: absolute;
+  width: 240rpx;
+  height: 240rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(74, 144, 217, 0.3);
+}
+
+.pulse-ring.animate {
+  animation: pulse 1.5s ease-out infinite;
+}
+
+.pulse-ring-inner {
+  position: absolute;
+  top: -20rpx;
+  left: -20rpx;
+  right: -20rpx;
+  bottom: -20rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(74, 144, 217, 0.15);
+}
+
+.pulse-ring-inner.animate {
+  animation: pulse 1.5s ease-out infinite 0.5s;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.mic-icon {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4A90D9, #357ABD);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
+}
+
+.mic-icon.active {
+  animation: breathe 1.5s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.mic-emoji {
+  font-size: 72rpx;
+}
+
+.voice-hint {
+  color: #ffffff;
+  font-size: 32rpx;
+  margin-bottom: 16rpx;
+}
+
+.recognizing-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 28rpx;
+  max-width: 500rpx;
+  text-align: center;
+  margin-bottom: 24rpx;
+  min-height: 40rpx;
+}
+
+.voice-cancel {
+  margin-top: 20rpx;
+  padding: 16rpx 48rpx;
+  border-radius: 40rpx;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.cancel-text {
+  color: #ffffff;
+  font-size: 28rpx;
+}

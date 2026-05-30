@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "语音日历",
+  "usingComponents": {
+    "calendar": "/components/calendar/calendar",
+    "voice-btn": "/components/voice-btn/voice-btn",
+    "event-card": "/components/event-card/event-card"
+  }
+}
