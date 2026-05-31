@@ -21,14 +21,15 @@ var CATEGORY_MAP = {
 
 var SYSTEM_PROMPT = '你是一个日历助手的NLP解析模块。请从用户的语音输入中提取结构化信息，以JSON格式返回。\n\n' +
   '返回格式：\n' +
-  '{"intent":"add|delete|query|modify|set_reminder","date":"YYYY-MM-DD或null","startTime":"HH:MM或null","endTime":"HH:MM或null","title":"事件标题","category":"meeting|work|life|health|study|other","reminder":提前提醒分钟数或null}\n\n' +
+  '{"intent":"add|delete|query|modify|set_reminder","date":"YYYY-MM-DD或null","startTime":"HH:MM或null","endTime":"HH:MM或null","title":"事件标题","category":"meeting|work|life|health|study|other","reminder":提前提醒分钟数或null,"oldTitle":"修改时原事件标题或null","newDate":"修改后的日期YYYY-MM-DD或null","newStartTime":"修改后的时间HH:MM或null","newEndTime":"修改后的结束时间HH:MM或null","newTitle":"修改后的标题或null"}\n\n' +
   '规则：\n' +
   '1. 相对日期（明天、后天、下周三等）必须根据当前时间转换为绝对日期YYYY-MM-DD\n' +
   '2. 时间转换为24小时制HH:MM格式，下午3点→15:00\n' +
   '3. 如果没有明确时间，startTime为null\n' +
   '4. title应简洁，只保留事件核心内容，去掉时间日期词\n' +
   '5. category根据内容判断：会议→meeting，工作→work，生活→life，健康→health，学习→study，其他→other\n' +
-  '6. 只返回纯JSON，不要返回markdown代码块或其他内容'
+  '6. 对于modify意图：title是要修改的原事件标题，oldTitle也设为原事件标题；newDate/newStartTime/newEndTime/newTitle为修改后的新值，未提及的设为null\n' +
+  '7. 只返回纯JSON，不要返回markdown代码块或其他内容'
 
 function parseWithAI(text, callback) {
   if (!config.DEEPSEEK_API_KEY) {
@@ -117,6 +118,14 @@ function parseAIResponse(content, rawText) {
     entities.category = CATEGORY_MAP[aiResult.category] || 'other'
     if (aiResult.reminder !== null && aiResult.reminder !== undefined) {
       entities.reminder = aiResult.reminder
+    }
+
+    if (intent === INTENT_TYPES.MODIFY_EVENT) {
+      entities.oldTitle = aiResult.oldTitle || aiResult.title || null
+      entities.newDate = aiResult.newDate || null
+      entities.newStartTime = aiResult.newStartTime || null
+      entities.newEndTime = aiResult.newEndTime || null
+      entities.newTitle = aiResult.newTitle || null
     }
 
     return {

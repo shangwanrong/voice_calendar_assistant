@@ -1,0 +1,12 @@
+var BAIDU_API_KEY = '你的百度智能云API Key'
+var BAIDU_SECRET_KEY = '你的百度智能云Secret Key'
+
+var DEEPSEEK_API_KEY = '你的DeepSeek API Key'
+var DEEPSEEK_BASE_URL = 'https://api.deepseek.com/v1'
+
+module.exports = {
+  BAIDU_API_KEY: BAIDU_API_KEY,
+  BAIDU_SECRET_KEY: BAIDU_SECRET_KEY,
+  DEEPSEEK_API_KEY: DEEPSEEK_API_KEY,
+  DEEPSEEK_BASE_URL: DEEPSEEK_BASE_URL
+}

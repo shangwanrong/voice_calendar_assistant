@@ -139,7 +139,7 @@ Page({
         break
 
       case INTENT_TYPES.MODIFY_EVENT:
-        this.showFeedback('修改功能请进入事件详情操作', 'info')
+        this.voiceModifyEvent(entities, result.feedbackText)
         break
 
       case INTENT_TYPES.SET_REMINDER:
@@ -191,6 +191,61 @@ Page({
     } else {
       this.showFeedback('找到多个匹配事件，请手动选择删除', 'info')
     }
+  },
+
+  voiceModifyEvent: function (entities, feedbackText) {
+    var that = this
+    var searchTitle = entities.oldTitle || entities.title
+    var events = eventStore.findLocalEventByTitleAndDate(searchTitle, entities.date)
+
+    if (events.length === 0) {
+      this.showFeedback('未找到"' + searchTitle + '"相关事件', 'error')
+      return
+    }
+
+    if (events.length > 1) {
+      this.showFeedback('找到多个"' + searchTitle + '"，请手动选择修改', 'info')
+      return
+    }
+
+    var event = events[0]
+    var updateData = {}
+
+    if (entities.newTitle) {
+      updateData.title = entities.newTitle
+    }
+    if (entities.newDate) {
+      updateData.date = entities.newDate
+    }
+    if (entities.newStartTime) {
+      updateData.startTime = entities.newStartTime
+      updateData.isAllDay = false
+    }
+    if (entities.newEndTime) {
+      updateData.endTime = entities.newEndTime
+    }
+
+    var hasChange = Object.keys(updateData).length > 0
+    if (!hasChange) {
+      this.showFeedback('未检测到需要修改的内容', 'info')
+      return
+    }
+
+    eventStore.updateLocalEvent(event._id, updateData).then(function () {
+      that.loadTodayEvents(that.data.currentDate)
+      that.loadMonthEvents(that.data.currentDate)
+
+      var changes = []
+      if (updateData.title) changes.push('标题改为"' + updateData.title + '"')
+      if (updateData.date) changes.push('日期改为' + timeParser.getFriendlyDate(updateData.date))
+      if (updateData.startTime) changes.push('时间改为' + timeParser.getFriendlyTime(updateData.startTime))
+      if (updateData.endTime) changes.push('结束时间改为' + timeParser.getFriendlyTime(updateData.endTime))
+
+      var msg = '已修改"' + searchTitle + '"：' + changes.join('，')
+      that.showFeedback(msg, 'success')
+    }).catch(function (err) {
+      that.showFeedback('修改失败，请重试', 'error')
+    })
   },
 
   voiceQueryEvent: function (entities, feedbackText) {
