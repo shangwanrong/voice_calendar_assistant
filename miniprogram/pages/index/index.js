@@ -62,6 +62,7 @@ Page({
 
   onDateSelect: function (e) {
     var date = e.detail.date
+    if (date === this.data.currentDate) return
     this.setData({ currentDate: date })
     this.loadTodayEvents(date)
   },
@@ -89,7 +90,7 @@ Page({
 
   onVoiceTap: function () {
     var that = this
-    if (this.data.isListening) {
+    if (voice.getIsListening()) {
       voice.stopRecognize()
       this.setData({ isListening: false, recognizingText: '' })
       return
@@ -108,7 +109,6 @@ Page({
       },
       onError: function (err) {
         that.setData({ isListening: false, recognizingText: '' })
-        that.showFeedback('语音识别失败，请重试', 'error')
       },
       onStop: function () {
         that.setData({ isListening: false })

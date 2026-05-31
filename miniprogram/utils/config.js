@@ -1,0 +1,7 @@
+var BAIDU_API_KEY = 'I1GLzVm3vnEiZbQ9vsw3rmz7'
+var BAIDU_SECRET_KEY = 'lC1fVWffyv8CzqnEICrsMCIW2imjOgfd'
+
+module.exports = {
+  BAIDU_API_KEY: BAIDU_API_KEY,
+  BAIDU_SECRET_KEY: BAIDU_SECRET_KEY
+}

@@ -1,12 +1,5 @@
 App({
   onLaunch: function () {
-    if (!wx.cloud) {
-      console.error('请使用 2.2.3 或以上的基础库以使用云能力')
-    } else {
-      wx.cloud.init({
-        traceUser: true
-      })
-    }
     this.globalData = {
       userInfo: null,
       settings: {
@@ -15,6 +8,15 @@ App({
       }
     }
     this.loadSettings()
+    this.initVoice()
+  },
+
+  initVoice: function () {
+    var config = require('./utils/config')
+    var voice = require('./utils/voice')
+    if (config.BAIDU_API_KEY && config.BAIDU_SECRET_KEY) {
+      voice.setBaiduConfig(config.BAIDU_API_KEY, config.BAIDU_SECRET_KEY)
+    }
   },
 
   loadSettings: function () {

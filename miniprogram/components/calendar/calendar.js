@@ -81,7 +81,7 @@ Component({
 
     onDayTap: function (e) {
       var dateStr = e.currentTarget.dataset.date
-      if (!dateStr) return
+      if (!dateStr || dateStr === this.data.selectedDate) return
       this.setData({ selectedDate: dateStr })
       this.triggerEvent('dateselect', { date: dateStr })
     },
