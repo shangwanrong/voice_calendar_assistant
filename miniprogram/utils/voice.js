@@ -1,4 +1,5 @@
 var nlp = require('./nlp')
+var aiNlp = require('./ai-nlp')
 
 var recorderManager = null
 var isListening = false
@@ -7,7 +8,6 @@ var isStarting = false
 var lastStopTime = 0
 var callbacksBound = false
 var startTimeoutId = null
-var forceStopping = false
 
 var currentOnResult = null
 var currentOnError = null
@@ -187,32 +187,31 @@ function bindCallbacks() {
     currentOnRecognizing('识别中...')
 
     recognizeByBaidu(res.tempFilePath, function (err, text) {
-      isProcessing = false
-      if (err || !text) {
-        console.error('语音识别失败，降级为文字输入', err)
-        showTextInputFallback(function (result) {
-          currentOnResult(result)
-        })
-        return
-      }
+        if (err || !text) {
+          isProcessing = false
+          console.error('语音识别失败，降级为文字输入', err)
+          showTextInputFallback(function (result) {
+            currentOnResult(result)
+          })
+          return
+        }
 
-      console.log('语音识别成功: ' + text)
-      var parseResult = nlp.parse(text.trim())
-      currentOnResult({
-        rawText: text.trim(),
-        parseResult: parseResult,
-        feedbackText: nlp.generateFeedbackText(parseResult)
-      })
+        console.log('语音识别成功: ' + text)
+        aiNlp.parseWithAI(text.trim(), function (aiErr, parseResult) {
+          isProcessing = false
+          currentOnResult({
+            rawText: text.trim(),
+            parseResult: parseResult,
+            feedbackText: nlp.generateFeedbackText(parseResult)
+          })
+        })
     })
   })
 
   recorderManager.onError(function (err) {
-    if (forceStopping) {
-      var msg = (err && err.errMsg) || ''
-      if (msg.indexOf('stop record fail') >= 0 || msg.indexOf('stop fail') >= 0) {
-        forceStopping = false
-        return
-      }
+    var msg = (err && err.errMsg) || ''
+    if (msg.indexOf('stop record fail') >= 0 || msg.indexOf('stop fail') >= 0 || msg.indexOf('audio is recording') >= 0) {
+      return
     }
     console.error('录音错误', err)
     resetAllState()
@@ -300,13 +299,11 @@ function beginRecording() {
 
   isStarting = true
 
-  forceStopping = true
   try {
     recorderManager.stop()
   } catch (e) {}
 
   setTimeout(function () {
-    forceStopping = false
     if (isProcessing || !isStarting) {
       isStarting = false
       return

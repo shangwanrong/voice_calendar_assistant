@@ -1,6 +1,7 @@
 var eventStore = require('../../utils/event-store')
 var voice = require('../../utils/voice')
 var nlp = require('../../utils/nlp')
+var tts = require('../../utils/tts')
 var INTENT_TYPES = require('../../utils/constants').INTENT_TYPES
 var timeParser = require('../../utils/time-parser')
 
@@ -96,6 +97,8 @@ Page({
       return
     }
 
+    tts.stop()
+
     voice.startRecognize({
       onStart: function () {
         that.setData({ isListening: true, recognizingText: '', showFeedback: false })
@@ -154,7 +157,7 @@ Page({
       title: entities.title,
       date: entities.date || timeParser.formatDate(new Date()),
       startTime: entities.startTime || '',
-      endTime: '',
+      endTime: entities.endTime || '',
       isAllDay: !entities.startTime,
       reminder: entities.reminder !== undefined ? entities.reminder : 15,
       category: entities.category || 'other',
@@ -215,6 +218,7 @@ Page({
       feedbackType: type || 'success',
       showFeedback: true
     })
+    tts.speak(text)
     var that = this
     setTimeout(function () {
       that.setData({ showFeedback: false })

@@ -36,7 +36,7 @@ function classifyIntent(text) {
 
 function extractDate(text) {
   var datePatterns = [
-    /今天|明日?|后天|大后天/,
+    /今天|明天|明日|后天|大后天/,
     /(这|下)(周|星期)(一|二|三|四|五|六|日|天)/,
     /\d{1,2}月\d{1,2}[号日]/,
     /\d{4}年\d{1,2}月\d{1,2}[号日]?/
