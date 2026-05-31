@@ -17,6 +17,9 @@ Page({
     feedbackType: 'success'
   },
 
+  _pendingEntities: null,
+  _followUpMode: null,
+
   onLoad: function () {
     var today = timeParser.formatDate(new Date())
     this.setData({ currentDate: today })
@@ -98,7 +101,11 @@ Page({
     }
 
     tts.stop()
+    this.startListening()
+  },
 
+  startListening: function () {
+    var that = this
     voice.startRecognize({
       onStart: function () {
         that.setData({ isListening: true, recognizingText: '', showFeedback: false })
@@ -112,6 +119,10 @@ Page({
       },
       onError: function (err) {
         that.setData({ isListening: false, recognizingText: '' })
+        if (that._followUpMode) {
+          that._followUpMode = null
+          that._pendingEntities = null
+        }
       },
       onStop: function () {
         that.setData({ isListening: false })
@@ -119,11 +130,24 @@ Page({
     })
   },
 
+  startFollowUpListening: function (delay) {
+    var that = this
+    var ms = delay || 1500
+    setTimeout(function () {
+      that.startListening()
+    }, ms)
+  },
+
   handleVoiceResult: function (result) {
     var parseResult = result.parseResult
     var intent = parseResult.intent
     var entities = parseResult.entities
     var that = this
+
+    if (this._followUpMode && this._pendingEntities) {
+      this.handleFollowUpResult(result)
+      return
+    }
 
     switch (intent) {
       case INTENT_TYPES.ADD_EVENT:
@@ -146,13 +170,103 @@ Page({
         this.showFeedback('提醒设置功能即将上线', 'info')
         break
 
+      case INTENT_TYPES.UNKNOWN:
+        this.showFeedback('这不是日程指令，请说"明天下午三点开会"这样的指令', 'info')
+        break
+
       default:
         this.showFeedback('抱歉，没有理解您的意思，请再说一次', 'error')
     }
   },
 
+  handleFollowUpResult: function (result) {
+    var rawText = (result.rawText || '').trim()
+    var parseResult = result.parseResult
+    var entities = parseResult.entities
+    var pending = this._pendingEntities
+
+    this._followUpMode = null
+
+    var extractedDate = entities.date
+    if (!extractedDate && rawText) {
+      var dateKeyword = rawText.match(/今天|明天|后天|大后天|昨天|前天|(这|上|下)(周|星期)(一|二|三|四|五|六|日|天)|\d{1,2}月\d{1,2}[号日]|\d{4}年\d{1,2}月\d{1,2}[号日]?/)
+      if (dateKeyword) {
+        var parsedDate = timeParser.getRelativeDate(dateKeyword[0])
+        if (parsedDate) extractedDate = timeParser.formatDate(parsedDate)
+      }
+    }
+
+    var extractedTime = entities.startTime
+    if (!extractedTime && rawText) {
+      extractedTime = timeParser.parseTimeStr(rawText)
+    }
+
+    var extractedEndTime = entities.endTime || null
+
+    if (extractedDate && !pending.date) {
+      pending.date = extractedDate
+    }
+    if (extractedTime && !pending.startTime) {
+      pending.startTime = extractedTime
+      pending.isAllDay = false
+      if (extractedEndTime) pending.endTime = extractedEndTime
+    }
+
+    if (!pending.date || !pending.startTime) {
+      if (!pending.date && !pending.startTime) {
+        this._pendingEntities = pending
+        this._followUpMode = 'date'
+        this.showFeedback('请问是哪一天几点？', 'info')
+      } else if (!pending.date) {
+        this._pendingEntities = pending
+        this._followUpMode = 'date'
+        this.showFeedback('请问是哪一天？', 'info')
+      } else {
+        this._pendingEntities = pending
+        this._followUpMode = 'time'
+        this.showFeedback('请问几点？', 'info')
+      }
+      this.startFollowUpListening()
+      return
+    }
+
+    this._pendingEntities = null
+    this.doAddEvent(pending, pending.recurrence || 'none')
+  },
+
   voiceAddEvent: function (entities, feedbackText) {
+    var missingDate = !entities.date
+    var missingTime = !entities.startTime
+
+    if (missingDate || missingTime) {
+      this._pendingEntities = entities
+
+      if (missingDate && missingTime) {
+        this._followUpMode = 'date'
+        this.showFeedback('请问"' + (entities.title || '这个事件') + '"是哪一天几点？', 'info')
+      } else if (missingDate) {
+        this._followUpMode = 'date'
+        this.showFeedback('请问"' + (entities.title || '这个事件') + '"是哪一天？', 'info')
+      } else {
+        this._followUpMode = 'time'
+        this.showFeedback('请问"' + (entities.title || '这个事件') + '"几点？', 'info')
+      }
+
+      this.startFollowUpListening()
+      return
+    }
+
+    this.doAddEvent(entities, entities.recurrence || 'none', feedbackText)
+  },
+
+  doAddEvent: function (entities, recurrence, feedbackText) {
     var that = this
+
+    if (recurrence !== 'none') {
+      this.addRecurringEvent(entities, recurrence)
+      return
+    }
+
     var eventData = {
       title: entities.title,
       date: entities.date || timeParser.formatDate(new Date()),
@@ -161,7 +275,7 @@ Page({
       isAllDay: !entities.startTime,
       reminder: entities.reminder !== undefined ? entities.reminder : 15,
       category: entities.category || 'other',
-      note: ''
+      note: entities.note || ''
     }
 
     eventStore.saveEventLocal(eventData).then(function () {
@@ -170,6 +284,46 @@ Page({
       that.showFeedback(feedbackText, 'success')
     }).catch(function (err) {
       that.showFeedback('添加失败，请重试', 'error')
+    })
+  },
+
+  addRecurringEvent: function (entities, recurrence) {
+    var that = this
+    var count = recurrence === 'daily' ? 30 : (recurrence === 'weekdays' ? 30 : (recurrence === 'weekly' ? 12 : 12))
+    var startDate = entities.recurrenceStart || entities.date || null
+    var endDate = entities.recurrenceEnd || null
+    var dates = timeParser.getRecurringDates(recurrence, count, startDate, endDate)
+    var title = entities.title
+    var startTime = entities.startTime || ''
+    var endTime = entities.endTime || ''
+    var category = entities.category || 'other'
+    var note = entities.note || ''
+    var reminder = entities.reminder !== undefined ? entities.reminder : 15
+    var isAllDay = !entities.startTime
+
+    var saved = 0
+    var total = dates.length
+
+    dates.forEach(function (date) {
+      var eventData = {
+        title: title,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+        isAllDay: isAllDay,
+        reminder: reminder,
+        category: category,
+        note: note
+      }
+      eventStore.saveEventLocal(eventData).then(function () {
+        saved++
+        if (saved === total) {
+          that.loadTodayEvents(that.data.currentDate)
+          that.loadMonthEvents(that.data.currentDate)
+          var label = recurrence === 'daily' ? '每天' : (recurrence === 'weekly' ? '每周' : '每月')
+          that.showFeedback('已添加' + label + '"' + title + '"，共' + total + '次', 'success')
+        }
+      })
     })
   },
 

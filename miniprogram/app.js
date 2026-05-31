@@ -9,6 +9,7 @@ App({
     }
     this.loadSettings()
     this.initVoice()
+    this.initReminder()
   },
 
   initVoice: function () {
@@ -17,6 +18,11 @@ App({
     if (config.BAIDU_API_KEY && config.BAIDU_SECRET_KEY) {
       voice.setBaiduConfig(config.BAIDU_API_KEY, config.BAIDU_SECRET_KEY)
     }
+  },
+
+  initReminder: function () {
+    var reminder = require('./utils/reminder')
+    reminder.startChecking()
   },
 
   loadSettings: function () {
