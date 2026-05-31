@@ -33,7 +33,7 @@ Component({
 
   methods: {
     onTap: function () {
-      this.triggerEvent('tap', { event: this.properties.event })
+      this.triggerEvent('eventtap', { event: this.properties.event })
     },
 
     onDelete: function () {

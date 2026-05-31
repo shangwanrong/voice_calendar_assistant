@@ -16,7 +16,7 @@
     <view class="events-list" wx:if="{{events.length > 0}}">
       <event-card wx:for="{{events}}" wx:key="_id"
                   event="{{item}}" showDelete="{{true}}"
-                  bind:tap="onEventTap" bind:delete="onEventDelete" />
+                  bind:eventtap="onEventTap" bind:delete="onEventDelete" />
     </view>
 
     <view class="empty-state" wx:if="{{events.length === 0}}">

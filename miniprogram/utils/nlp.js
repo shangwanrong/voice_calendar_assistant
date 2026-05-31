@@ -20,11 +20,11 @@ function classifyIntent(text) {
   if (hasReminder && hasTimeBefore) return INTENT_TYPES.SET_REMINDER
 
   var hasQuery = QUERY_KEYWORDS.some(function (k) { return text.indexOf(k) >= 0 })
-  var hasTimeWord = text.match(/今天|明天|后天|这周|下周|这月|本月/)
+  var hasTimeWord = text.match(/今天|明天|后天|昨天|前天|上周|这周|下周|这月|本月/)
   if (hasQuery && hasTimeWord) return INTENT_TYPES.QUERY_EVENT
 
   var hasTime = text.match(/\d+[点时:：]|上午|下午|早上|晚上|中午|凌晨/)
-  var hasDate = text.match(/今天|明天|后天|大后天|周[一二三四五六日天]|下周|这周|\d+月\d+/)
+  var hasDate = text.match(/今天|明天|后天|大后天|昨天|前天|上周|周[一二三四五六日天]|下周|这周|\d+月\d+/)
   var hasAdd = ADD_KEYWORDS.some(function (k) { return text.indexOf(k) >= 0 })
 
   if (hasTime || hasDate || hasAdd) return INTENT_TYPES.ADD_EVENT
@@ -36,8 +36,8 @@ function classifyIntent(text) {
 
 function extractDate(text) {
   var datePatterns = [
-    /今天|明日?|后天|大后天/,
-    /(这|下)(周|星期)(一|二|三|四|五|六|日|天)/,
+    /今天|明天|明日|后天|大后天/,
+    /(这|上|下)(周|星期)(一|二|三|四|五|六|日|天)/,
     /\d{1,2}月\d{1,2}[号日]/,
     /\d{4}年\d{1,2}月\d{1,2}[号日]?/
   ]
@@ -75,8 +75,8 @@ function extractTime(text) {
 function extractTitle(text) {
   var cleaned = text
   cleaned = cleaned.replace(/(添加|新增|安排|定|有|加|建|创建|设置|记|提醒我|删除|取消|去掉|删掉|移除|修改|改|调整)/g, '')
-  cleaned = cleaned.replace(/(今天|明天|后天|大后天|这周|下周|本月)/g, '')
-  cleaned = cleaned.replace(/(这|下)(周|星期)(一|二|三|四|五|六|日|天)/g, '')
+  cleaned = cleaned.replace(/(今天|明天|后天|大后天|昨天|前天|这周|上周|下周|本月)/g, '')
+  cleaned = cleaned.replace(/(这|上|下)(周|星期)(一|二|三|四|五|六|日|天)/g, '')
   cleaned = cleaned.replace(/\d{4}年/g, '')
   cleaned = cleaned.replace(/\d{1,2}月\d{1,2}[号日]/g, '')
   cleaned = cleaned.replace(/(凌晨|早上|上午|中午|下午|晚上|夜里|深夜)?\d{1,2}[点时:：]\d{1,2}分?/g, '')

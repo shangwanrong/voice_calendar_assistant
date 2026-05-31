@@ -53,15 +53,20 @@ function getRelativeDate(text) {
   if (text === '昨天') return addDays(today, -1)
   if (text === '前天') return addDays(today, -2)
 
-  var weekMatch = text.match(/(这|下)(周|星期)(一|二|三|四|五|六|日|天)/)
+  var weekMatch = text.match(/(这|上|下)(周|星期)(一|二|三|四|五|六|日|天)/)
   if (weekMatch) {
     var isNext = weekMatch[1] === '下'
+    var isPrev = weekMatch[1] === '上'
     var dayMap = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '日': 0, '天': 0 }
     var targetDay = dayMap[weekMatch[3]]
     var currentDay = today.getDay()
     var diff = targetDay - currentDay
-    if (diff <= 0 && !isNext) diff += 7
-    if (isNext) diff += 7
+    if (isPrev) {
+      if (diff >= 0) diff -= 7
+    } else {
+      if (diff <= 0 && !isNext) diff += 7
+      if (isNext) diff += 7
+    }
     return addDays(today, diff)
   }
 
@@ -163,6 +168,55 @@ function getFriendlyTime(timeStr) {
   return period + displayHour + '点' + minute + '分'
 }
 
+function getRecurringDates(recurrence, count, startDate, endDate) {
+  var dates = []
+  var now = new Date()
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  var start = startDate ? parseDateStr(startDate) : today
+  var end = endDate ? parseDateStr(endDate) : null
+  var i
+
+  if (recurrence === 'daily') {
+    var d = new Date(start)
+    while (dates.length < count) {
+      if (end && d > end) break
+      dates.push(formatDate(d))
+      d = addDays(d, 1)
+    }
+  } else if (recurrence === 'weekdays') {
+    var d2 = new Date(start)
+    while (dates.length < count) {
+      if (end && d2 > end) break
+      var day = d2.getDay()
+      if (day !== 0 && day !== 6) {
+        dates.push(formatDate(d2))
+      }
+      d2 = addDays(d2, 1)
+    }
+  } else if (recurrence === 'weekly') {
+    var d3 = new Date(start)
+    while (dates.length < count) {
+      if (end && d3 > end) break
+      dates.push(formatDate(d3))
+      d3 = addDays(d3, 7)
+    }
+  } else if (recurrence === 'monthly') {
+    var dayOfMonth = start.getDate()
+    var nextMonth = new Date(start)
+    while (dates.length < count) {
+      if (end && nextMonth > end) break
+      dates.push(formatDate(nextMonth))
+      var nextM = nextMonth.getMonth() + 1
+      var nextY = nextMonth.getFullYear()
+      if (nextM > 11) { nextM = 0; nextY++ }
+      var nextDay = Math.min(dayOfMonth, new Date(nextY, nextM + 1, 0).getDate())
+      nextMonth = new Date(nextY, nextM, nextDay)
+    }
+  }
+
+  return dates
+}
+
 module.exports = {
   formatDate: formatDate,
   formatTime: formatTime,
@@ -175,5 +229,6 @@ module.exports = {
   getRelativeDate: getRelativeDate,
   parseTimeStr: parseTimeStr,
   getFriendlyDate: getFriendlyDate,
-  getFriendlyTime: getFriendlyTime
+  getFriendlyTime: getFriendlyTime,
+  getRecurringDates: getRecurringDates
 }

@@ -1,0 +1,13 @@
+node_modules/
+miniprogram_npm/
+
+miniprogram/utils/config.js
+
+project.private.config.json
+
+cloudfunctions/*/node_modules/
+cloudfunctions/*/package-lock.json
+
+.DS_Store
+Thumbs.db
+*.log

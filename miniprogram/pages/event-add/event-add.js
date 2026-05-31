@@ -29,11 +29,38 @@ Page({
 
     var reminderLabels = REMINDER_OPTIONS.map(function (r) { return r.label })
 
-    this.setData({
+    var setData = {
       date: date,
       categoryList: categoryList,
       reminderOptions: reminderLabels
-    })
+    }
+
+    if (options.title) setData.title = decodeURIComponent(options.title)
+    if (options.startTime) {
+      setData.startTime = options.startTime
+      setData.isAllDay = false
+    }
+    if (options.endTime) setData.endTime = options.endTime
+    if (options.note) setData.note = decodeURIComponent(options.note)
+    if (options.category) {
+      var catIdx = categoryKeys.indexOf(options.category)
+      if (catIdx >= 0) {
+        setData.category = options.category
+        setData.categoryIndex = catIdx
+      }
+    }
+    if (options.reminder) {
+      var remVal = parseInt(options.reminder)
+      setData.reminder = remVal
+      for (var k = 0; k < REMINDER_OPTIONS.length; k++) {
+        if (REMINDER_OPTIONS[k].value === remVal) {
+          setData.reminderIndex = k
+          break
+        }
+      }
+    }
+
+    this.setData(setData)
   },
 
   onTitleInput: function (e) {
